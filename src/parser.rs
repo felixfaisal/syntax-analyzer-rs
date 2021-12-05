@@ -92,7 +92,10 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                     println!("Extracting key");
                     state = PropertyStates::Key;
                     *index += 1;
-                } else {
+                } else if token.token_type == TokenTypes::MultiLineString {
+                    panic!("{}",format!("Key cannot be multiline string {}:{}",token.row,token.column));
+                }
+                else {
                     // Null
                     break;
                 }
