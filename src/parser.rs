@@ -69,4 +69,38 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
     }
     false
 }
+pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
+    let mut start_token: &Token;
+    let mut state = PropertyStates::_Start_;
+    while *index < token_list.len() {
+        let token = &token_list[*index];
+        match state {
+            PropertyStates::_Start_ => {
+                if token.token_type == TokenTypes::String {
+                    // We extract key
+                    println!("Extracting key");
+                    state = PropertyStates::Key;
+                    *index += 1;
+                } else {
+                    // Null
+                    break;
+                }
+            }
+            PropertyStates::Key => {
+                if token.token_type == TokenTypes::Colon {
+                    state = PropertyStates::Colon;
+                    *index += 1;
+                } else {
+                    panic!("Unexpect Token");
+                }
+            }
+            PropertyStates::Colon => {
+                // parse value
+                println!("Extracted Value");
+                parse_value(input, token_list, index);
+                break;
+            }
+        }
+    }
+}
 
