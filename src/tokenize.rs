@@ -234,5 +234,49 @@ impl TokenTypes {
         })
     }
 }
-
+pub fn tokenize(data: String) {
+    let lines: Vec<&str> = data.split("\n").collect();
+    let mut tokens: Vec<Token> = vec![];
+    let mut j: usize = 0;
+    let mut x: usize = 0;
+    while x < lines.len() {
+        j = 0;
+        while j < lines[x].len() {
+            let character = lines[x].as_bytes()[j] as char;
+            //parse whitespace
+            if character == ' ' {
+                j += 1;
+                continue;
+            }
+            // TODO The code elegant here
+            let token = TokenTypes::parse_char(&character, x as i32, j as i32);
+            if token.is_some() {
+                tokens.push(token.unwrap());
+            } else {
+                let token_string = TokenTypes::parse_string(lines[x], x, &mut j);
+                //dbg!(&token_string);
+                if token_string.is_some() {
+                    tokens.push(token_string.unwrap());
+                } else {
+                    let token_comment = TokenTypes::parse_comment(lines[x], x, &mut j);
+                    if token_comment.is_some() {
+                        tokens.push(token_comment.unwrap());
+                    } else {
+                       let token_multi_line = TokenTypes::parse_multiline_string(&lines, &mut x, &mut j);
+                       if token_multi_line.is_some(){
+                           tokens.push(token_multi_line.unwrap())
+                       }
+                       else{
+                           panic!("{}",format!("Unidentified Symbol {} at line {}:{}",character,x,j));
+                       }
+                    }
+                }
+            }
+            j += 1;
+        }
+        x += 1;
+    }
+    dbg!(&tokens);
+    //let mut index: usize = 0;
+}
 
