@@ -103,4 +103,27 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
         }
     }
 }
+pub fn parse_value(input: &str, token_list: &Vec<Token>, index: &mut usize) {
+    let token = &token_list[*index];
+    // Parse value
+    let value = parse_literal(input, token_list, index) || parse_object(input, token_list, index);
+    //dbg!(&value);
+    if value {
+        println!("Parsed Value Succesfully");
+    } else {
+        panic!("Unexpected Token");
+    }
+    // if value, we return value
+    // else we say error
+}
+pub fn parse_literal(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
+    let token = &token_list[*index];
+    if token.token_type == TokenTypes::String {
+        *index += 1;
+        return true;
+    }
+    false
+}
+ 
+
 

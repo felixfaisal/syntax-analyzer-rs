@@ -1,3 +1,5 @@
+use crate::parser::parse_object;
+
 #[derive(PartialEq,Debug)]
 pub enum TokenTypes {
     LeftBrace = 0,
@@ -277,6 +279,7 @@ pub fn tokenize(data: String) {
         x += 1;
     }
     dbg!(&tokens);
-    //let mut index: usize = 0;
+    let mut index: usize = 0;
+    parse_object(&lines[0], &tokens, &mut index);
 }
 
