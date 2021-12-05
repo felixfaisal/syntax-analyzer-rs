@@ -31,7 +31,10 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
                 if token.token_type == TokenTypes::RightBrace {
                     //break;
                     return true;
-                } else {
+                } else if token.token_type == TokenTypes::Comment {
+                    *index += 1;
+                }
+                else {
                     parse_property(input, token_list, index);
                     println!("Parsed Property Sucesfully");
                     state = ObjectStates::Property;
@@ -48,7 +51,11 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
                     state = ObjectStates::Comma;
                     *index += 1;
                     println!("Property parsed!");
-                } else {
+                } 
+                else if token.token_type == TokenTypes::Comment {
+                    *index += 1;
+                }
+                else {
                     panic!("Unexpected Token");
                 }
             }
@@ -61,7 +68,11 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
                     //break;
                     return true;
                     // return object and allowing trailing commas
-                } else {
+                }
+                else if token.token_type == TokenTypes::Comment {
+                    *index += 1;
+                } 
+                else {
                     panic!("Unexpected Token");
                 }
             }
@@ -90,7 +101,10 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                 if token.token_type == TokenTypes::Colon {
                     state = PropertyStates::Colon;
                     *index += 1;
-                } else {
+                } else if token.token_type == TokenTypes::Comment {
+                    *index += 1;
+                } 
+                else {
                     panic!("Unexpect Token");
                 }
             }
