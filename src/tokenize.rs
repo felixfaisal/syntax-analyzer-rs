@@ -1,6 +1,6 @@
 use crate::parser::parse_object;
 
-#[derive(PartialEq,Debug)]
+#[derive(PartialEq, Debug)]
 pub enum TokenTypes {
     LeftBrace = 0,
     RightBrace,
@@ -83,12 +83,13 @@ impl TokenTypes {
     pub fn parse_string(input: &str, row: usize, column: &mut usize) -> Option<Token> {
         let mut buffer: String = String::new();
         let mut state = StringStates::_Start_;
-        if *column+2 < input.len() && format!(
-            "{}{}{}",
-            input.chars().nth(*column).unwrap(),
-            input.chars().nth(*column + 1).unwrap(),
-            input.chars().nth(*column + 2).unwrap()
-        ) == "\"\"\""
+        if *column + 2 < input.len()
+            && format!(
+                "{}{}{}",
+                input.chars().nth(*column).unwrap(),
+                input.chars().nth(*column + 1).unwrap(),
+                input.chars().nth(*column + 2).unwrap()
+            ) == "\"\"\""
         {
             return None;
         }
@@ -131,27 +132,31 @@ impl TokenTypes {
         }
         None
     }
-    pub fn parse_multiline_string(input: &Vec<&str>, row: &mut usize, column: &mut usize) -> Option<Token> {
+    pub fn parse_multiline_string(
+        input: &Vec<&str>,
+        row: &mut usize,
+        column: &mut usize,
+    ) -> Option<Token> {
         let mut buffer: String = String::new();
         let mut state = StringStates::_Start_;
         let mut row_holder: usize = *row;
-        while *column < input[*row].len(){
+        while *column < input[*row].len() {
             let return_string = buffer.clone();
             //dbg!(input.chars());
             let character = input[*row].as_bytes()[*column as usize] as char;
             match state {
                 StringStates::_Start_ => {
-                    if *column+2<input[*row].len() && format!(
-                        "{}{}{}",
-                        input[*row].chars().nth(*column).unwrap(),
-                        input[*row].chars().nth(*column + 1).unwrap(),
-                        input[*row].chars().nth(*column + 2).unwrap()
-                    ) == "\"\"\""
+                    if *column + 2 < input[*row].len()
+                        && format!(
+                            "{}{}{}",
+                            input[*row].chars().nth(*column).unwrap(),
+                            input[*row].chars().nth(*column + 1).unwrap(),
+                            input[*row].chars().nth(*column + 2).unwrap()
+                        ) == "\"\"\""
                     {
-                       state = StringStates::StartQuoteOrChar;
-                       *column += 3;
-                    }
-                    else{
+                        state = StringStates::StartQuoteOrChar;
+                        *column += 3;
+                    } else {
                         return None;
                     }
                 }
@@ -159,12 +164,14 @@ impl TokenTypes {
                     if character == '\\' {
                         buffer += &character.to_string();
                         state = StringStates::Escape;
-                    } else if *column+2 < input[*row].len() && format!(
-                        "{}{}{}",
-                        input[*row].chars().nth(*column).unwrap(),
-                        input[*row].chars().nth(*column + 1).unwrap(),
-                        input[*row].chars().nth(*column + 2).unwrap()
-                    ) == "\"\"\"" {
+                    } else if *column + 2 < input[*row].len()
+                        && format!(
+                            "{}{}{}",
+                            input[*row].chars().nth(*column).unwrap(),
+                            input[*row].chars().nth(*column + 1).unwrap(),
+                            input[*row].chars().nth(*column + 2).unwrap()
+                        ) == "\"\"\""
+                    {
                         // return
                         *column += 2;
                         return Some(Token {
@@ -173,8 +180,7 @@ impl TokenTypes {
                             column: *column as i32,
                             value: Some(Value::String(return_string)),
                         });
-                    }
-                    else if *column+1 == input[*row].len(){
+                    } else if *column + 1 == input[*row].len() {
                         //println!("Found multiline");
                         *row += 1;
                         *column = 0;
@@ -197,7 +203,9 @@ impl TokenTypes {
     pub fn parse_comment(input: &str, row: usize, column: &mut usize) -> Option<Token> {
         let mut buffer: String = String::new();
         let mut state = CommentStates::_Start_;
-        if *column+1 >= input.len() { return None}
+        if *column + 1 >= input.len() {
+            return None;
+        }
         if format!(
             "{}{}",
             input.chars().nth(*column).unwrap(),
@@ -213,7 +221,7 @@ impl TokenTypes {
                     if format!(
                         "{}{}",
                         input.chars().nth(*column).unwrap(),
-                        input.chars().nth(*column+1).unwrap()
+                        input.chars().nth(*column + 1).unwrap()
                     ) == "//"
                     {
                         *column += 2;
@@ -264,13 +272,16 @@ pub fn tokenize(data: String) {
                     if token_comment.is_some() {
                         tokens.push(token_comment.unwrap());
                     } else {
-                       let token_multi_line = TokenTypes::parse_multiline_string(&lines, &mut x, &mut j);
-                       if token_multi_line.is_some(){
-                           tokens.push(token_multi_line.unwrap())
-                       }
-                       else{
-                           panic!("{}",format!("Unidentified Symbol {} at line {}:{}",character,x,j));
-                       }
+                        let token_multi_line =
+                            TokenTypes::parse_multiline_string(&lines, &mut x, &mut j);
+                        if token_multi_line.is_some() {
+                            tokens.push(token_multi_line.unwrap())
+                        } else {
+                            panic!(
+                                "{}",
+                                format!("Unidentified Symbol {} at line {}:{}", character, x, j)
+                            );
+                        }
                     }
                 }
             }
@@ -282,4 +293,3 @@ pub fn tokenize(data: String) {
     let mut index: usize = 0;
     parse_object(&lines[0], &tokens, &mut index);
 }
-

@@ -4,7 +4,6 @@ pub enum ObjectStates {
     OpenObject,
     Property,
     Comma,
-    
 }
 pub enum PropertyStates {
     _Start_ = 0,
@@ -15,7 +14,8 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
     let mut start_token: &Token;
     let mut state = ObjectStates::_Start_;
     while *index < token_list.len() {
-        let token = &token_list[*index];
+        let mut token = &token_list[*index];
+        dbg!(&token);
         match state {
             ObjectStates::_Start_ => {
                 if token.token_type == TokenTypes::LeftBrace {
@@ -33,12 +33,12 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
                     return true;
                 } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
-                }
-                else {
+                } else {
                     parse_property(input, token_list, index);
                     println!("Parsed Property Sucesfully");
                     state = ObjectStates::Property;
-                    *index += 1;
+                    //dbg!(&token);
+                    //*index += 1;
                 }
             }
             ObjectStates::Property => {
@@ -50,29 +50,33 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
                 } else if token.token_type == TokenTypes::Comma {
                     state = ObjectStates::Comma;
                     *index += 1;
-                    println!("Property parsed!");
-                } 
-                else if token.token_type == TokenTypes::Comment {
+                    println!("Found comma");
+                } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
-                }
-                else {
+                } else {
+                    dbg!(&token);
                     panic!("Unexpected Token");
                 }
             }
             ObjectStates::Comma => {
                 // parse property
+                dbg!(&index);
                 parse_property(input, token_list, index);
+                dbg!(&index);
+                token = &token_list[*index];
+                dbg!(&token);
                 // if property then append to children
                 if token.token_type == TokenTypes::RightBrace {
                     println!("Object Parsed");
                     //break;
                     return true;
                     // return object and allowing trailing commas
-                }
-                else if token.token_type == TokenTypes::Comment {
+                } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
-                } 
-                else {
+                } else if token.token_type == TokenTypes::Comma {
+                    state = ObjectStates::Comma;
+                    *index += 1;
+                } else {
                     panic!("Unexpected Token");
                 }
             }
@@ -93,9 +97,14 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                     state = PropertyStates::Key;
                     *index += 1;
                 } else if token.token_type == TokenTypes::MultiLineString {
-                    panic!("{}",format!("Key cannot be multiline string {}:{}",token.row,token.column));
-                }
-                else {
+                    panic!(
+                        "{}",
+                        format!(
+                            "Key cannot be multiline string {}:{}",
+                            token.row, token.column
+                        )
+                    );
+                } else {
                     // Null
                     break;
                 }
@@ -106,9 +115,8 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                     *index += 1;
                 } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
-                } 
-                else {
-                    panic!("Unexpect Token");
+                } else {
+                    panic!("Unexpect Token in extracting value");
                 }
             }
             PropertyStates::Colon => {
@@ -141,6 +149,3 @@ pub fn parse_literal(input: &str, token_list: &Vec<Token>, index: &mut usize) ->
     }
     false
 }
- 
-
-
