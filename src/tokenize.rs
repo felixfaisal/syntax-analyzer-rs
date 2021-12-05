@@ -292,4 +292,6 @@ pub fn tokenize(data: String) {
     dbg!(&tokens);
     let mut index: usize = 0;
     parse_object(&lines[0], &tokens, &mut index);
+    dbg!(index);
+    dbg!(tokens.len());
 }
