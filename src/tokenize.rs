@@ -240,7 +240,7 @@ impl TokenTypes {
         })
     }
 }
-pub fn tokenize(data: String) -> bool{
+pub fn tokenize(data: String) -> bool {
     let lines: Vec<&str> = data.split("\n").collect();
     let mut tokens: Vec<Token> = vec![];
     let mut j: usize;
@@ -254,15 +254,12 @@ pub fn tokenize(data: String) -> bool{
                 j += 1;
                 continue;
             }
-            // TODO The code elegant here
+            // TODO This is pure spaghetti code
             let token = TokenTypes::parse_char(&character, x as i32, j as i32);
-            //(token.is_some()).then(|| tokens.push(token_string.unwrap())).unwrap_or(());
             if token.is_some() {
                 tokens.push(token.unwrap());
             } else {
                 let token_string = TokenTypes::parse_string(lines[x], x, &mut j);
-                //dbg!(&token_string);
-                //(token_string.is_some()).then(|| tokens.push(token_string.unwrap())).unwrap_or(());
                 if token_string.is_some() {
                     tokens.push(token_string.unwrap());
                 } else {
@@ -287,12 +284,11 @@ pub fn tokenize(data: String) -> bool{
         }
         x += 1;
     }
-    dbg!(&tokens);
     let mut index: usize = 0;
     parse_object(&lines[0], &tokens, &mut index);
-    if index == tokens.len(){
+    if index == tokens.len() {
         true
-    } else{
+    } else {
         false
     }
 }

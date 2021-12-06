@@ -12,72 +12,52 @@ pub enum PropertyStates {
 }
 pub enum ArrayStates {
     _Start_ = 0,
-    OpenArray, 
-    Value, 
-    Comma
+    OpenArray,
+    Value,
+    Comma,
 }
 pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
     let mut state = ObjectStates::_Start_;
     while *index < token_list.len() {
         let mut token = &token_list[*index];
-        dbg!(&token);
         match state {
             ObjectStates::_Start_ => {
                 if token.token_type == TokenTypes::LeftBrace {
                     state = ObjectStates::OpenObject;
                     *index += 1;
-                    println!("Start Parsing Object");
                 } else {
                     break;
-                    // return null
                 }
             }
             ObjectStates::OpenObject => {
                 if token.token_type == TokenTypes::RightBrace {
-                    //break;
                     return true;
                 } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
                 } else {
                     parse_property(input, token_list, index);
-                    println!("Parsed Property Sucesfully");
                     state = ObjectStates::Property;
-                    //dbg!(&token);
-                    //*index += 1;
                 }
             }
             ObjectStates::Property => {
                 if token.token_type == TokenTypes::RightBrace {
-                    // return object
-                    println!("Object prased!");
                     *index += 1;
-                    //break;
                     return true;
                 } else if token.token_type == TokenTypes::Comma {
                     state = ObjectStates::Comma;
                     *index += 1;
-                    println!("Found comma");
                 } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
                 } else {
-                    dbg!(&token);
                     panic!("Unexpected Token");
                 }
             }
             ObjectStates::Comma => {
-                // parse property
-                dbg!(&index);
                 parse_property(input, token_list, index);
-                dbg!(&index);
                 token = &token_list[*index];
-                dbg!(&token);
-                // if property then append to children
                 if token.token_type == TokenTypes::RightBrace {
                     *index += 1;
-                    println!("Object Parsed");
-                    //break;
                     return true;
-                    // return object and allowing trailing commas
                 } else if token.token_type == TokenTypes::Comment {
                     *index += 1;
                 } else if token.token_type == TokenTypes::Comma {
@@ -99,7 +79,6 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
             PropertyStates::_Start_ => {
                 if token.token_type == TokenTypes::String {
                     // We extract key
-                    println!("Extracting key");
                     state = PropertyStates::Key;
                     *index += 1;
                 } else if token.token_type == TokenTypes::MultiLineString {
@@ -111,7 +90,6 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                         )
                     );
                 } else {
-                    // Null
                     break;
                 }
             }
@@ -126,8 +104,6 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
                 }
             }
             PropertyStates::Colon => {
-                // parse value
-                println!("Extracted Value");
                 parse_value(input, token_list, index);
                 break;
             }
@@ -135,23 +111,14 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
     }
 }
 pub fn parse_value(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
-    //let token = &token_list[*index];
-    // Parse value
-    let value = parse_literal(input, token_list, index) || parse_object(input, token_list, index) || parse_array(input, token_list, index);
-    //dbg!(&value);
-    dbg!(&value);
-    if value {
-        println!("Parsed Value Succesfully");
-    } else {
-        //panic!("Unexpected Token");
-    }
+    let value = parse_literal(input, token_list, index)
+        || parse_object(input, token_list, index)
+        || parse_array(input, token_list, index);
     value
-    // if value, we return value
-    // else we say error
 }
 pub fn parse_literal(_input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
     let token = &token_list[*index];
-    if token.token_type == TokenTypes::String || token.token_type == TokenTypes::MultiLineString{
+    if token.token_type == TokenTypes::String || token.token_type == TokenTypes::MultiLineString {
         *index += 1;
         return true;
     }
@@ -159,36 +126,34 @@ pub fn parse_literal(_input: &str, token_list: &Vec<Token>, index: &mut usize) -
 }
 pub fn parse_array(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
     let mut state = ArrayStates::_Start_;
-    while *index < token_list.len(){
+    while *index < token_list.len() {
         let token = &token_list[*index];
-        match state{
+        match state {
             ArrayStates::_Start_ => {
                 if token.token_type == TokenTypes::LeftBracket {
                     state = ArrayStates::OpenArray;
                     *index += 1;
-                }
-                else{
+                } else {
                     break;
                 }
-            },
+            }
             ArrayStates::OpenArray => {
-                if token.token_type == TokenTypes::RightBracket{
+                if token.token_type == TokenTypes::RightBracket {
                     *index += 1;
                     return true;
-                } else{
+                } else {
                     parse_value(input, token_list, index);
                     state = ArrayStates::Value;
                 }
             }
             ArrayStates::Value => {
-                if token.token_type == TokenTypes::RightBracket{
+                if token.token_type == TokenTypes::RightBracket {
                     *index += 1;
                     return true;
-                }
-                else if token.token_type == TokenTypes::Comma{
+                } else if token.token_type == TokenTypes::Comma {
                     state = ArrayStates::Comma;
                     *index += 1;
-                } else{
+                } else {
                     panic!("Unexpected Token");
                 }
             }
