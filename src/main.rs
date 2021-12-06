@@ -18,7 +18,29 @@ mod tests {
     #[test]
     fn test_example() {
         let file = std::fs::read_to_string("test.anon").expect("Something went wrong");
-        //tokenize(file);
         assert_eq!(tokenize(file),true);
     }
+    #[test]
+    #[should_panic]
+    fn test_example_1() {
+        let file = std::fs::read_to_string("testcases/test_1.anon").expect("Something went wrong");
+        tokenize(file);
+    }
+    #[test]
+    #[should_panic]
+    fn test_example_2() {
+        let file = std::fs::read_to_string("testcases/test_2.anon").expect("Something went wrong");
+        tokenize(file);
+    }
+    #[test]
+    fn test_example_3() {
+        let file = std::fs::read_to_string("testcases/test_3.anon").expect("Something went wrong");
+        assert_eq!(tokenize(file),true);
+    }
+    #[test]
+    fn test_example_4() {
+        let file = std::fs::read_to_string("testcases/test_4.anon").expect("Something went wrong");
+        assert_eq!(tokenize(file),true);
+    }
+
 }
