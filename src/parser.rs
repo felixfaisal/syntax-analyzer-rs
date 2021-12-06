@@ -17,7 +17,6 @@ pub enum ArrayStates {
     Comma
 }
 pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
-    let mut start_token: &Token;
     let mut state = ObjectStates::_Start_;
     while *index < token_list.len() {
         let mut token = &token_list[*index];
@@ -25,7 +24,6 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
         match state {
             ObjectStates::_Start_ => {
                 if token.token_type == TokenTypes::LeftBrace {
-                    start_token = token;
                     state = ObjectStates::OpenObject;
                     *index += 1;
                     println!("Start Parsing Object");
@@ -94,7 +92,6 @@ pub fn parse_object(input: &str, token_list: &Vec<Token>, index: &mut usize) -> 
     false
 }
 pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
-    let mut start_token: &Token;
     let mut state = PropertyStates::_Start_;
     while *index < token_list.len() {
         let token = &token_list[*index];
@@ -138,7 +135,7 @@ pub fn parse_property(input: &str, token_list: &Vec<Token>, index: &mut usize) {
     }
 }
 pub fn parse_value(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
-    let token = &token_list[*index];
+    //let token = &token_list[*index];
     // Parse value
     let value = parse_literal(input, token_list, index) || parse_object(input, token_list, index) || parse_array(input, token_list, index);
     //dbg!(&value);
@@ -152,7 +149,7 @@ pub fn parse_value(input: &str, token_list: &Vec<Token>, index: &mut usize) -> b
     // if value, we return value
     // else we say error
 }
-pub fn parse_literal(input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
+pub fn parse_literal(_input: &str, token_list: &Vec<Token>, index: &mut usize) -> bool {
     let token = &token_list[*index];
     if token.token_type == TokenTypes::String || token.token_type == TokenTypes::MultiLineString{
         *index += 1;

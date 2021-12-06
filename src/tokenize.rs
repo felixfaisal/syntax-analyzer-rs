@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 use crate::parser::parse_object;
 
 #[derive(PartialEq, Debug)]
@@ -9,10 +10,6 @@ pub enum TokenTypes {
     Colon,
     Comma,
     String,
-    Number,
-    True,
-    False,
-    Null,
     MultiLineString,
     Comment,
 }
@@ -139,7 +136,6 @@ impl TokenTypes {
     ) -> Option<Token> {
         let mut buffer: String = String::new();
         let mut state = StringStates::_Start_;
-        let mut row_holder: usize = *row;
         while *column < input[*row].len() {
             let return_string = buffer.clone();
             //dbg!(input.chars());
@@ -244,10 +240,10 @@ impl TokenTypes {
         })
     }
 }
-pub fn tokenize(data: String) {
+pub fn tokenize(data: String) -> bool{
     let lines: Vec<&str> = data.split("\n").collect();
     let mut tokens: Vec<Token> = vec![];
-    let mut j: usize = 0;
+    let mut j: usize;
     let mut x: usize = 0;
     while x < lines.len() {
         j = 0;
@@ -260,11 +256,13 @@ pub fn tokenize(data: String) {
             }
             // TODO The code elegant here
             let token = TokenTypes::parse_char(&character, x as i32, j as i32);
+            //(token.is_some()).then(|| tokens.push(token_string.unwrap())).unwrap_or(());
             if token.is_some() {
                 tokens.push(token.unwrap());
             } else {
                 let token_string = TokenTypes::parse_string(lines[x], x, &mut j);
                 //dbg!(&token_string);
+                //(token_string.is_some()).then(|| tokens.push(token_string.unwrap())).unwrap_or(());
                 if token_string.is_some() {
                     tokens.push(token_string.unwrap());
                 } else {
@@ -292,6 +290,9 @@ pub fn tokenize(data: String) {
     dbg!(&tokens);
     let mut index: usize = 0;
     parse_object(&lines[0], &tokens, &mut index);
-    dbg!(index);
-    dbg!(tokens.len());
+    if index == tokens.len(){
+        true
+    } else{
+        false
+    }
 }
