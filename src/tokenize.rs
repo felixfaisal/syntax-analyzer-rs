@@ -254,31 +254,23 @@ pub fn tokenize(data: String) -> bool {
                 j += 1;
                 continue;
             }
-            // TODO This is pure spaghetti code
-            let token = TokenTypes::parse_char(&character, x as i32, j as i32);
-            if token.is_some() {
-                tokens.push(token.unwrap());
-            } else {
-                let token_string = TokenTypes::parse_string(lines[x], x, &mut j);
-                if token_string.is_some() {
-                    tokens.push(token_string.unwrap());
-                } else {
-                    let token_comment = TokenTypes::parse_comment(lines[x], x, &mut j);
-                    if token_comment.is_some() {
-                        tokens.push(token_comment.unwrap());
-                    } else {
-                        let token_multi_line =
-                            TokenTypes::parse_multiline_string(&lines, &mut x, &mut j);
-                        if token_multi_line.is_some() {
-                            tokens.push(token_multi_line.unwrap())
-                        } else {
-                            panic!(
-                                "{}",
-                                format!("Unidentified Symbol {} at line {}:{}", character, x, j)
-                            );
-                        }
-                    }
-                }
+            if let Some(token) = TokenTypes::parse_char(&character, x as i32, j as i32){
+                tokens.push(token);
+            }
+            else if let Some(token) = TokenTypes::parse_string(lines[x], x, &mut j){
+                tokens.push(token);
+            }
+            else if let Some(token) = TokenTypes::parse_comment(lines[x], x, &mut j){
+                tokens.push(token);
+            }
+            else if let Some(token) =  TokenTypes::parse_multiline_string(&lines, &mut x, &mut j){
+                tokens.push(token);
+            }
+            else{
+                panic!(
+                    "{}",
+                    format!("Unidentified Symbol {} at line {}:{}", character, x, j)
+                ); 
             }
             j += 1;
         }
