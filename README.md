@@ -1,5 +1,5 @@
-# ANONrs
-A Rust binary crate that is used to validate ANON files as part of the hiring challenge.
+# Syntax-Analyzer-rs
+A Rust binary crate that is used to validate JSON files with trailing commas,comments and multiline strings.
 
 In order to solve this challenge, I'm using basics of Compiler Design concepts. So the program is divided into two parts 
     - Tokenizer (Lexical Analyzer)
@@ -29,7 +29,7 @@ A syntax analyzer basically constructs an **Abstract Syntax Tree** using **Conte
 ## How to run
 
 ```bash 
-cargo run <ANON File Path>
+cargo run <JSON File Path>
 ``` 
 Here's an example 
 
