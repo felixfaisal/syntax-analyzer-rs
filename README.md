@@ -42,7 +42,7 @@ Valid file ✅
 ```
 ## Test Suite
 
-There are couple of ANON files already which are being used for testing purposes and have been integrated with GitHub Actions, If you would like to run it locally then use the following command
+There are couple of JSON files already which are being used for testing purposes and have been integrated with GitHub Actions, If you would like to run it locally then use the following command
 
 ```bash
 cargo test 
